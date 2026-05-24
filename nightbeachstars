@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moonlit Shore</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&amp;family=Quicksand:wght@300;400;500&amp;display=swap" rel="stylesheet">
+  <style>
+    html, body { height: 100%; margin: 0; overflow-x: hidden; }
+    body { font-family: 'Quicksand', sans-serif; background: #0a0e1a; }
+    .font-heading { font-family: 'Cormorant Garamond', serif; }
+
+    /* Stars */
+    .star {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--dur) ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.5); }
+    }
+
+    /* Shooting stars */
+    .shooting-star {
+      position: absolute;
+      width: 120px; height: 2px;
+      background: linear-gradient(to right, transparent, #4fc3f7, #00e5ff);
+      border-radius: 2px;
+      animation: shoot 3s linear infinite;
+      opacity: 0;
+      filter: drop-shadow(0 0 6px #00e5ff);
+    }
+    @keyframes shoot {
+      0% { transform: translateX(0) translateY(0); opacity: 1; }
+      100% { transform: translateX(-400px) translateY(300px); opacity: 0; }
+    }
+
+    /* Fireflies */
+    .firefly {
+      position: absolute;
+      width: 6px; height: 6px;
+      background: radial-gradient(circle, #80deea, transparent);
+      border-radius: 50%;
+      animation: float var(--dur) ease-in-out infinite;
+      box-shadow: 0 0 8px #80deea, 0 0 16px #4dd0e1;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(var(--dx), var(--dy)); }
+      50% { transform: translate(calc(var(--dx) * -0.5), calc(var(--dy) * 1.2)); }
+      75% { transform: translate(calc(var(--dx) * 0.8), calc(var(--dy) * -0.6)); }
+    }
+
+    /* Glassmorphism card */
+    .glass-card {
+      background: rgba(10, 20, 40, 0.4);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(79, 195, 247, 0.2);
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.1), inset 0 0 30px rgba(0, 229, 255, 0.05);
+      animation: glow-border 4s ease-in-out infinite;
+    }
+    @keyframes glow-border {
+      0%, 100% { border-color: rgba(79, 195, 247, 0.2); box-shadow: 0 0 30px rgba(0, 229, 255, 0.1); }
+      50% { border-color: rgba(79, 195, 247, 0.5); box-shadow: 0 0 50px rgba(0, 229, 255, 0.25); }
+    }
+
+    /* Ocean waves */
+    .wave {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 120px;
+      background: linear-gradient(to top, rgba(10, 30, 60, 0.8), transparent);
+      animation: wave-move 6s ease-in-out infinite;
+    }
+    .wave::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: -10%; right: -10%;
+      height: 60px;
+      border-radius: 50% 50% 0 0;
+      background: rgba(13, 71, 161, 0.3);
+      animation: wave-shape 4s ease-in-out infinite;
+    }
+    @keyframes wave-move { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes wave-shape { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(1.05); } }
+
+    /* Gallery */
+    .gallery-item {
+      transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border: 1px solid rgba(79, 195, 247, 0.15);
+    }
+    .gallery-item:hover {
+      transform: scale(1.05) translateY(-8px);
+      box-shadow: 0 20px 60px rgba(0, 229, 255, 0.3);
+      border-color: rgba(79, 195, 247, 0.6);
+    }
+
+    /* Particles */
+    .particle {
+      position: absolute;
+      width: 3px; height: 3px;
+      background: rgba(128, 222, 234, 0.6);
+      border-radius: 50%;
+      animation: particle-float var(--dur) linear infinite;
+      filter: blur(1px);
+    }
+    @keyframes particle-float {
+      0% { transform: translateY(0) translateX(0); opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateY(-200px) translateX(var(--dx)); opacity: 0; }
+    }
+
+    /* Smooth scroll */
+    html { scroll-behavior: smooth; }
+
+    .neon-text {
+      text-shadow: 0 0 10px rgba(0, 229, 255, 0.5), 0 0 40px rgba(0, 229, 255, 0.2);
+    }
+
+    .section-fade {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .section-fade.visible { opacity: 1; transform: translateY(0); }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full overflow-auto">
+  <div id="app" class="relative w-full" style="min-height: 100%;"><!-- Sky / Background -->
+   <div class="fixed inset-0 bg-gradient-to-b from-[#040814] via-[#0a1628] to-[#0d2137]" id="sky"></div><!-- Stars container -->
+   <div id="stars-container" class="fixed inset-0 pointer-events-none"></div><!-- Shooting stars -->
+   <div id="shooting-stars" class="fixed inset-0 pointer-events-none"></div><!-- Particles -->
+   <div id="particles" class="fixed inset-0 pointer-events-none"></div><!-- Fireflies -->
+   <div id="fireflies" class="fixed inset-0 pointer-events-none"></div><!-- Ocean waves -->
+   <div class="fixed bottom-0 left-0 right-0 pointer-events-none">
+    <div class="wave"></div>
+    <div class="wave" style="animation-delay: -2s; opacity: 0.5; height: 90px;"></div>
+   </div><!-- Content -->
+   <div class="relative z-10"><!-- Hero Section -->
+    <section class="flex items-center justify-center px-4 py-16" style="min-height: 100%;">
+     <div class="glass-card rounded-3xl p-8 md:p-14 max-w-2xl w-full text-center">
+      <h1 id="main-title" class="font-heading text-5xl md:text-7xl font-300 text-white neon-text mb-4 tracking-wide">Moonlit Shore</h1>
+      <p id="subtitle" class="text-lg md:text-xl text-cyan-200/80 font-light leading-relaxed">Waves, stars, and memories beneath the midnight sky 🌌</p>
+      <div class="mt-8 flex justify-center gap-4"><a href="#gallery" class="px-6 py-3 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-200 hover:bg-cyan-500/20 hover:border-cyan-400/60 transition-all duration-300 text-sm">Explore Gallery</a>
+      </div>
+     </div>
+    </section><!-- Gallery Section -->
+    <section id="gallery" class="px-4 py-20 section-fade">
+     <h2 class="font-heading text-4xl md:text-5xl text-white text-center neon-text mb-12">Beach Memories</h2>
+     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+      <div class="gallery-item rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-[#0d2a4a] to-[#061224] flex items-center justify-center">
+       <div class="text-center p-6">
+        <div class="text-4xl mb-3">
+         🌊
+        </div>
+        <p class="text-cyan-200/70 text-sm">Midnight Waves</p>
+       </div>
+      </div>
+      <div class="gallery-item rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-[#0a1e3d] to-[#081428] flex items-center justify-center">
+       <div class="text-center p-6">
+        <div class="text-4xl mb-3">
+         🌙
+        </div>
+        <p class="text-cyan-200/70 text-sm">Crescent Reflections</p>
+       </div>
+      </div>
+      <div class="gallery-item rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-[#0b2240] to-[#07101f] flex items-center justify-center">
+       <div class="text-center p-6">
+        <div class="text-4xl mb-3">
+         ✨
+        </div>
+        <p class="text-cyan-200/70 text-sm">Starlit Sand</p>
+       </div>
+      </div>
+      <div class="gallery-item rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-[#0e2845] to-[#05101c] flex items-center justify-center">
+       <div class="text-center p-6">
+        <div class="text-4xl mb-3">
+         🐚
+        </div>
+        <p class="text-cyan-200/70 text-sm">Shell Whispers</p>
+       </div>
+      </div>
+      <div class="gallery-item rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-[#091c38] to-[#060e1e] flex items-center justify-center">
+       <div class="text-center p-6">
+        <div class="text-4xl mb-3">
+         🏖️
+        </div>
+        <p class="text-cyan-200/70 text-sm">Distant Horizon</p>
+       </div>
+      </div>
+      <div class="gallery-item rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-[#0c2442] to-[#071225] flex items-center justify-center">
+       <div class="text-center p-6">
+        <div class="text-4xl mb-3">
+         🌅
+        </div>
+        <p class="text-cyan-200/70 text-sm">Blue Hour</p>
+       </div>
+      </div>
+     </div>
+    </section><!-- Footer -->
+    <section class="px-4 py-16 text-center section-fade">
+     <p class="text-cyan-300/40 text-sm">✦ Moonlit Shore ✦ Where the ocean meets the stars ✦</p>
+    </section>
+   </div><!-- Audio control --> <button id="audio-btn" class="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full glass-card flex items-center justify-center text-cyan-300 hover:text-white transition-colors" aria-label="Toggle sound"> <i data-lucide="volume-2" id="audio-icon-on" style="width:20px;height:20px;"></i> <i data-lucide="volume-x" id="audio-icon-off" style="width:20px;height:20px;display:none;"></i> </button>
+  </div>
+  <script>
+    // Element SDK
+    const defaultConfig = {
+      main_title: 'Moonlit Shore',
+      subtitle_text: 'Waves, stars, and memories beneath the midnight sky 🌌',
+      background_color: '#040814',
+      surface_color: '#0a1628',
+      text_color: '#ffffff',
+      primary_action: '#00e5ff',
+      secondary_action: '#80deea',
+      font_family: 'Cormorant Garamond',
+      font_size: 16
+    };
+
+    function applyConfig(config) {
+      const title = document.getElementById('main-title');
+      const subtitle = document.getElementById('subtitle');
+      if (title) title.textContent = config.main_title || defaultConfig.main_title;
+      if (subtitle) subtitle.textContent = config.subtitle_text || defaultConfig.subtitle_text;
+      const font = config.font_family || defaultConfig.font_family;
+      if (title) title.style.fontFamily = `${font}, serif`;
+    }
+
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => applyConfig(config),
+      mapToCapabilities: (config) => ({
+        recolorables: [
+          { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+          { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+          { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+          { get: () => config.primary_action || defaultConfig.primary_action, set: (v) => { config.primary_action = v; window.elementSdk.setConfig({ primary_action: v }); } },
+          { get: () => config.secondary_action || defaultConfig.secondary_action, set: (v) => { config.secondary_action = v; window.elementSdk.setConfig({ secondary_action: v }); } }
+        ],
+        borderables: [],
+        fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+        fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); } }
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ['main_title', config.main_title || defaultConfig.main_title],
+        ['subtitle_text', config.subtitle_text || defaultConfig.subtitle_text]
+      ])
+    });
+
+    // Generate stars
+    const starsContainer = document.getElementById('stars-container');
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 60 + '%';
+      star.style.setProperty('--dur', (2 + Math.random() * 4) + 's');
+      star.style.animationDelay = Math.random() * 4 + 's';
+      starsContainer.appendChild(star);
+    }
+
+    // Shooting stars
+    const shootingContainer = document.getElementById('shooting-stars');
+    for (let i = 0; i < 4; i++) {
+      const ss = document.createElement('div');
+      ss.className = 'shooting-star';
+      ss.style.top = (5 + Math.random() * 30) + '%';
+      ss.style.right = (-10 + Math.random() * 30) + '%';
+      ss.style.animationDelay = (i * 2.5 + Math.random() * 2) + 's';
+      ss.style.animationDuration = (2.5 + Math.random() * 1.5) + 's';
+      shootingContainer.appendChild(ss);
+    }
+
+    // Fireflies
+    const firefliesContainer = document.getElementById('fireflies');
+    for (let i = 0; i < 15; i++) {
+      const ff = document.createElement('div');
+      ff.className = 'firefly';
+      ff.style.left = (30 + Math.random() * 40) + '%';
+      ff.style.top = (30 + Math.random() * 40) + '%';
+      ff.style.setProperty('--dur', (4 + Math.random() * 6) + 's');
+      ff.style.setProperty('--dx', (Math.random() * 60 - 30) + 'px');
+      ff.style.setProperty('--dy', (Math.random() * 60 - 30) + 'px');
+      ff.style.animationDelay = Math.random() * 5 + 's';
+      firefliesContainer.appendChild(ff);
+    }
+
+    // Particles
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.bottom = '10%';
+      p.style.setProperty('--dur', (5 + Math.random() * 8) + 's');
+      p.style.setProperty('--dx', (Math.random() * 80 - 40) + 'px');
+      p.style.animationDelay = Math.random() * 8 + 's';
+      particlesContainer.appendChild(p);
+    }
+
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.section-fade').forEach(el => observer.observe(el));
+
+    // Audio - Web Audio API ocean waves
+    let audioCtx, isPlaying = false;
+    function createOceanSound() {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const bufferSize = audioCtx.sampleRate * 4;
+      const buffer = audioCtx.createBuffer(2, bufferSize, audioCtx.sampleRate);
+      for (let ch = 0; ch < 2; ch++) {
+        const data = buffer.getChannelData(ch);
+        for (let i = 0; i < bufferSize; i++) {
+          const t = i / audioCtx.sampleRate;
+          const wave = Math.sin(t * 0.3) * 0.5 + 0.5;
+          data[i] = (Math.random() * 2 - 1) * 0.15 * wave;
+        }
+      }
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 400;
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.3;
+      source.connect(filter).connect(gain).connect(audioCtx.destination);
+      source.start();
+      return { source, gain };
+    }
+
+    let audioNodes;
+    document.getElementById('audio-btn').addEventListener('click', () => {
+      if (!isPlaying) {
+        audioNodes = createOceanSound();
+        isPlaying = true;
+        document.getElementById('audio-icon-on').style.display = '';
+        document.getElementById('audio-icon-off').style.display = 'none';
+      } else {
+        if (audioCtx) audioCtx.close();
+        isPlaying = false;
+        document.getElementById('audio-icon-on').style.display = 'none';
+        document.getElementById('audio-icon-off').style.display = '';
+      }
+    });
+
+    lucide.createIcons();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a00a6c7529fdcdf5',t:'MTc3OTYwNjAyOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
